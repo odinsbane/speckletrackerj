@@ -29,6 +29,7 @@ public class TextWindow extends JFrame implements Runnable, ActionListener {
 
         JTextArea jta = new JTextArea(data);
         jta.setEditable(false);
+        
         JScrollPane jsp = new JScrollPane(jta);
         add(jsp);
         setSize(600,800);

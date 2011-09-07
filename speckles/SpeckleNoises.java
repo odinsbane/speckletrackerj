@@ -22,7 +22,8 @@ class SpeckleNoises implements Runnable{
         try{
             Synthesizer synth = MidiSystem.getSynthesizer();
             synth.open();
-            Soundbank sb = MidiSystem.getSoundbank(getClass().getResourceAsStream("soundbank.gm"));
+
+            Soundbank sb = MidiSystem.getSoundbank(getClass().getResourceAsStream("/soundbank.gm"));
             Instrument ins = sb.getInstruments()[408];
 
             synth.loadInstrument(ins);

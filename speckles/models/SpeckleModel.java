@@ -3,6 +3,7 @@ package speckles.models;
 import ij.ImagePlus;
 import speckles.Speckle;
 import speckles.SpeckleTracker;
+
 import java.io.File;
 import java.lang.reflect.Modifier;
 import java.net.URI;

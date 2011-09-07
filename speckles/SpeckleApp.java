@@ -10,6 +10,7 @@ import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import ij.process.ImageStatistics;
 import speckles.controls.*;
+import speckles.gui.AboutWindow;
 import speckles.models.AdjustModel;
 import speckles.models.LinearRefineModel;
 import speckles.models.SpeckleModel;
@@ -40,8 +41,8 @@ public class SpeckleApp{
        *    
        **/
        
-    public String VERSION = "0.84";
-    public String DATE = "8/14/2011";
+    public static String VERSION = "0.85";
+    public static String DATE = "9/7/2011";
     
     HashSet<Speckle> AllSpeckles,       //Stores all of the speckle data.
                      proof_speckles,    //used for the autolocate slider for drawing speckles
@@ -1651,8 +1652,7 @@ public class SpeckleApp{
     
     public void showVersion(){
         
-        String vmessage = "Version: " + VERSION + "\nLast built on: " + DATE;
-        JOptionPane.showMessageDialog(main_frame,vmessage,"current version" , JOptionPane.INFORMATION_MESSAGE);
+        AboutWindow.showAbout();
         
     }
 

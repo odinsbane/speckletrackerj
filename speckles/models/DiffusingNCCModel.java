@@ -11,9 +11,7 @@ import speckles.utils.NormalizedCrossCorrelationFilter;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import static speckles.models.NCCConstantVelocityModel.LIMIT;
-import static speckles.models.NCCConstantVelocityModel.SEARCHSIZE;
-import static speckles.models.NCCConstantVelocityModel.ALPHA;
+import static speckles.models.NCCConstantVelocityModel.*;
 
 public class DiffusingNCCModel extends SpeckleModel{
     public double MINVAR= 0.2;

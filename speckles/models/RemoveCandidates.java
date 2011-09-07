@@ -1,7 +1,6 @@
 package speckles.models;
 
 import speckles.Speckle;
-import speckles.SpeckleApp;
 
 import java.util.Comparator;
 import java.util.HashMap;

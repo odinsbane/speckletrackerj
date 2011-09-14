@@ -267,7 +267,7 @@ public class DiffusingNCCModel extends SpeckleModel{
     }
     
     
-    public SpeckleEstimator estimateLocation(SpeckleEstimator speck,int frame){
+    public void estimateLocation(SpeckleEstimator speck,int frame){
         if(frame<=SpeckleApp.getSlices(implus)){
             double[] pt = predictSpeckle(speck, frame);
                     
@@ -292,8 +292,7 @@ public class DiffusingNCCModel extends SpeckleModel{
         } else{
             speck.end();
         }
-        return speck;
-        
+
     }
     /**
      * For setting/changing model parameters.  One way to set parameters is to make static variables

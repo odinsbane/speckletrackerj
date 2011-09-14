@@ -24,18 +24,19 @@ import java.util.regex.Pattern;
     public static int REFINE_MODEL = 1;
     public static int CULL_MODEL = 2;
     public enum Models {
-        diffusing_NCC(new DiffusingNCCModel()),
-        constant_velocity_NCC(new NCCConstantVelocityModel()),
         diffusing_spots(new DiffusingSpotsModel()),
         diffusing_spots_backwards(new DiffusingSpotsBackwardsModel()),
         fixed_parameter_spots(new FixedIntensityModel()),
+        diffusing_NCC(new DiffusingNCCModel()),
+        constant_velocity_NCC(new NCCConstantVelocityModel()),
         static_model(new StaticSpeckleModel()),
         drift_model(new StaticDriftModel()),
         linear_refine(new LinearRefineModel()),
         adjustment_model(new AdjustModel()),
         gaussian_fit(new GaussianFit()),
         immobile(new ImmobileModel()),
-        remove_candidates(new RemoveCandidates());
+        remove_candidates(new RemoveCandidates()),
+        filler_model(new FillerModel());
 
         SpeckleModel model;
 
@@ -85,7 +86,7 @@ import java.util.regex.Pattern;
      * @param frame current frame
      * 
      **/
-    public abstract SpeckleEstimator estimateLocation(SpeckleEstimator speck,int frame);
+    public abstract void estimateLocation(SpeckleEstimator speck,int frame);
 
     /**
      *
@@ -135,7 +136,7 @@ import java.util.regex.Pattern;
         
         public double[] predictSpeckle(Speckle speck, int frame){return null;}
         
-        public SpeckleEstimator estimateLocation(SpeckleEstimator speck,int frame){return null;}
+        public void estimateLocation(SpeckleEstimator speck,int frame){return;}
         
         public SpeckleEstimator estimateLocation(Speckle speck,int frame, double[] pt){return null;}
 
@@ -189,7 +190,8 @@ import java.util.regex.Pattern;
 
     /**
      * Loads me some models.  Populates a list of models that are contained in the class path
-     * broken until further notice.
+     *
+     * ****************broken until further notice.***********************
      * @return
      */
     private static HashMap<Integer,SpeckleModel> loadModels(){

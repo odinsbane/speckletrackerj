@@ -48,10 +48,10 @@ public class ImmobileModel extends SpeckleModel {
     }
 
     @Override
-    public SpeckleEstimator estimateLocation(SpeckleEstimator speck, int frame) {
+    public void estimateLocation(SpeckleEstimator speck, int frame) {
         if(frame>implus.getStack().getSize()){
             speck.end();
-            return speck;
+            return;
 
         }
 
@@ -65,7 +65,6 @@ public class ImmobileModel extends SpeckleModel {
 
         if(speck.getFail()> SpeckleTracker.MAX_FAIL)
             speck.end();
-        return speck;
     }
 
     /**

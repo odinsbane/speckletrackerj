@@ -156,7 +156,6 @@ public class NonLinearSolver implements Fitter {
     public void fitData(){
         initializeWorkspace();
         int i;
-        String message = "did not converge";
         double changes = 0;
         for(i = 0; i<10000; i++){
 

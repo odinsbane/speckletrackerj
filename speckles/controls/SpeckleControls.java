@@ -284,23 +284,27 @@ public class SpeckleControls implements ActionListener{
         return analysis_controls.getSpeckleType();
     
     }
-    
+
+    /**
+     *
+     * @return size of square for displaying speckles as images.
+     */
     public int getSquareSize(){
             return analysis_controls.getSquareSize();
     }
-    
+
+    /**
+     *
+     * @return value of image relative in analysis window.
+     */
     public int getRelative(){
             return analysis_controls.getRelative();
     }
-        
-    public int getForegroundColor(){
-            return 0xffffff;
-    }
-    
-    public int getBackgroundColor(){
-            return 0xff0000;
-    }
-    
+
+    /**
+     * This listener does everything wtf.
+     * @param e
+     */
     public void actionPerformed(ActionEvent e) {
 
         WORKER.submitCommand(e.getActionCommand());
@@ -339,6 +343,9 @@ public class SpeckleControls implements ActionListener{
 
     }
 
+    /**
+     * Disable.
+     */
     public void setWaiting(){
         image_controls.setEnabled(false);
         reslice_control.setEnabled(false);
@@ -352,7 +359,10 @@ public class SpeckleControls implements ActionListener{
         setRunning(true);
 
     }
-    
+
+    /**
+     * set waiting but don't obtain focus.
+     */
     public void setDialogWaiting(){
         REQUEST_FOCUS = false;
         image_controls.setEnabled(false);
@@ -366,7 +376,11 @@ public class SpeckleControls implements ActionListener{
         profiler.setEnabled(false);
 
     }
-    
+
+    /**
+     * gets the model index, and displays the model currently selected.
+     * @return index of current model.
+     */
     public int getModelIndex(){
         int i = speckle_menu.getModelIndex();
         MODMESS.setMessage(SpeckleModel.Models.values()[i].name());
@@ -374,6 +388,9 @@ public class SpeckleControls implements ActionListener{
         
     }
 
+    /**
+     * Cycle to the next mode, wraps around.
+     */
     public void nextModel(){
         int i = speckle_menu.getModelIndex();
         i++;
@@ -382,6 +399,9 @@ public class SpeckleControls implements ActionListener{
         speckle_menu.setModelIndex(i);
     }
 
+    /**
+     * Select the previous model, this is a wrap around list.
+     */
     public void previousModel(){
         int i = speckle_menu.getModelIndex();
         i--;
@@ -390,20 +410,33 @@ public class SpeckleControls implements ActionListener{
         speckle_menu.setModelIndex(i);
 
     }
-    
+
+    /**
+     * Calls the profiler to plot the intensities of the selected speckle.
+     * @param speck - to be profiled.
+     * @param imp - image data.
+     */
     public void profileSpeckle(Speckle speck, ImagePlus imp){
         reslice_control.unsetMarker();
         parent.updateResliceSpeckles();
         profiler.profileSpeckle(speck, imp);
         
     }
-    
+
+    /**
+     * Causes the status bar to run/stop running.
+     * @param t - set it.
+     */
     synchronized public void setRunning(boolean t){
 
         message_panel.setRunning(t);
     }
 
-
+    /**
+     * Updates the datatable.
+     *
+     * @param speckles set of speckles the data table is synched to.
+     */
     public void updateSelector(HashSet<Speckle> speckles){
         final HashSet<Speckle> set = speckles;
         EventQueue.invokeLater(new Runnable(){
@@ -416,16 +449,30 @@ public class SpeckleControls implements ActionListener{
 
     }
 
+    /**
+     * Poorly named method for updating speckle tracks in selector table.
+     * @param imp - image data.
+     */
     public void updateAppearances(ImagePlus imp){
 
         speckle_selector.updateAppearances(imp);
         
     }
 
+    /**
+     * Creates a text window with selector table data.
+     */
     public void copySelectorToTextWindow() {
         speckle_selector.createTextWindowTable();
     }
 
+    /**
+     * UI initialization, creates a sliding pane for holding the selector
+     * includes two buttons for showing and updating.
+     *
+     * @param content where it will end up.
+     * @param selector the content of pane.
+     */
     private void createSelectorPane(Container content, JComponent selector){
         JPanel moving = new JPanel();
         BoxLayout lay = new BoxLayout(moving,BoxLayout.LINE_AXIS);
@@ -456,6 +503,9 @@ public class SpeckleControls implements ActionListener{
 
     }
 
+    /**
+     * selectively enable the directions for changing image slice.
+     */
     public void enableDirections(){
         reslice_control.setEnabled(true);
         profiler.setEnabled(true);
@@ -463,16 +513,27 @@ public class SpeckleControls implements ActionListener{
         
     }
 
+    /**
+     * indicate speckles have changed.
+     */
     public void touchSpeckles(){
         CHANGED = true;
     }
 
+    /**
+     *
+     * @return whether the speckles have been modified.
+     */
     public boolean checkChange(){
 
         return CHANGED;
         
     }
 
+    /**
+     * New speckles, freshly saved speckles, and just loaded speckles
+     * all cause the changed flag to be cleared.
+     */
     public void clearChange(){
 
         CHANGED = false;

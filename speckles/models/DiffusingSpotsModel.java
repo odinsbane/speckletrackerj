@@ -24,11 +24,11 @@ public class DiffusingSpotsModel extends SpeckleModel{
     double AVERAGE_INTENSITY;
     double AVERAGE_CHANGE;
     
-    static int SEARCHSIZE = 2;
+    static int SEARCHSIZE = 12;
     static double f_deltaI = 0.01;
     static double f_d = 0.05;
     static double f_I = 0.94;
-    static double w_min = 0.75;
+    static double w_min = 0.5;
     int DISPLACEMENT_COUNT = 0;
 
     double IMAGE_MEAN;
@@ -169,14 +169,14 @@ public class DiffusingSpotsModel extends SpeckleModel{
      * @param frame current frame
      * 
      **/
-    public SpeckleEstimator estimateLocation(SpeckleEstimator speck,int frame){
+    public void estimateLocation(SpeckleEstimator speck,int frame){
         if(frame<= SpeckleApp.getSlices(implus)){
             ArrayList<double[]> pts = predictSpeckle(speck, frame);
 
 
             if(pts.size()==0){
                 speck.end();
-                return speck;
+                return;
 
             }
 
@@ -204,7 +204,6 @@ public class DiffusingSpotsModel extends SpeckleModel{
                 }
 
             }
-            System.out.println("successful " + counting);
             speck.setWeights(best,best_pt,frame);
             if(test(best)){
                 speck.success();
@@ -221,7 +220,7 @@ public class DiffusingSpotsModel extends SpeckleModel{
 
         }
 
-        return speck;
+
     }
 
 
@@ -413,18 +412,6 @@ public class DiffusingSpotsModel extends SpeckleModel{
      * @return probability, ordering, number
      */
     public double[] modelCriteriaDebug(double value, double diff, double displacement){
-        //double[] results = new double[3];
-
-
-        //double main = intensity_probability*f_I + displacement_probability*f_d + change_probability*f_deltaI;
-
-        //double t = f_deltaI + f_I + f_d;
-        //main = main/t;
-        //results[0] = main>1?1:main;
-        //results[1] = intensity_probability + displacement_probability + change_probability;
-        //results[2] = (value - IMAGE_MEAN)/(AVERAGE_INTENSITY - IMAGE_MEAN);
-
-        //System.out.println(intensity_probability + "\t" + displacement_probability + "\t" + change_probability + "\t"  + results[0]);
 
         return calculateWeights(value,diff,displacement);
 

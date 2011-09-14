@@ -82,7 +82,7 @@ public class GaussianFit extends SpeckleModel{
      * 
      **/
       
-    public SpeckleEstimator estimateLocation(SpeckleEstimator speck,int frame){
+    public void estimateLocation(SpeckleEstimator speck,int frame){
 
         double[] pt, npt;
         double[] weights;
@@ -97,7 +97,6 @@ public class GaussianFit extends SpeckleModel{
         }
         speck.end();
 
-        return speck;
     }
     
     /**

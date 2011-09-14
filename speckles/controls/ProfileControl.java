@@ -70,6 +70,10 @@ public class ProfileControl implements MouseListener{
         profileSpeckle();
     }
 
+    /**
+     * measure the intensities of a speckles, scales the data for the small graph in
+     * profiler.
+     */
     private void profileSpeckle() {
         if(PROFILED==null||IMP==null)
             return;
@@ -104,8 +108,6 @@ public class ProfileControl implements MouseListener{
         
         
         for(Integer i: speck){
-            value = 0;
-            smooth_value = 0;
 
             pt = speck.getCoordinates(i);
             try{

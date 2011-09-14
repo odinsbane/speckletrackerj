@@ -230,21 +230,15 @@ public class MarquardtFitter implements Fitter {
 
 
             if(value<0){
-                //System.out.println("no improvement");
+
                 //reject changes
                 System.arraycopy(acopy, 0, A, 0, acopy.length);
                 updateLambda(value);
                 nerror = calculateErrors();
             } else{
 
-                /*
-                if(nerror>1){
-                    value = value/nerror;
-                }
-                */
-                //System.out.println(value + "\t" + A[0] );
+
                 if(value<0.0001){
-                    //System.out.println("#converged after: " + i + " iterations");
                     ITERATIONS = i;
                     break;
                 }

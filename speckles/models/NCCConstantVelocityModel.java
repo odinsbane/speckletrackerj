@@ -328,7 +328,7 @@ public class NCCConstantVelocityModel extends SpeckleModel{
     }
     
     
-    public SpeckleEstimator estimateLocation(SpeckleEstimator speck,int frame){
+    public void estimateLocation(SpeckleEstimator speck,int frame){
         
         if(frame<= SpeckleApp.getSlices(implus)){
             double[] pt = predictSpeckle(speck, frame);
@@ -358,8 +358,7 @@ public class NCCConstantVelocityModel extends SpeckleModel{
         } else{
             speck.end();
         }
-        return speck;
-        
+
     }
     public double filter( ImageProcessor improc, double x, double y){
         return ncc.filter(improc, x, y);

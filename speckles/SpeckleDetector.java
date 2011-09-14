@@ -180,7 +180,13 @@ public class SpeckleDetector{
 
 
     
-    /** returns the xy coordinates to for the maximum value of working, adjusts all but moves slowly.*/
+    /** returns the xy coordinates to for the maximum value of working, adjusts all but moves slowly.
+     *  only performs one iteration of the algorithm as opposed to the 
+     * @param xy
+     * @param radius
+     * @param working
+     * @return
+     */
     public static double[] refinePt(double[] xy, int radius, ImageProcessor working){
         double dx = 0;
         double dy = 0;

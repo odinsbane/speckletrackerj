@@ -57,8 +57,8 @@ public class SpeckleTracker implements Runnable{
     
     public boolean trackSpeckle(SpeckleEstimator speck){
             int n = speck.getLastFrame() + 1;
-            SpeckleEstimator est = SPECKLE_MODEL.estimateLocation(speck, n);
-            return est.isWorking();
+            SPECKLE_MODEL.estimateLocation(speck, n);
+            return speck.isWorking();
 
     
     }
@@ -376,7 +376,11 @@ public class SpeckleTracker implements Runnable{
         
     }
 
-    //refine models
+    /**
+     * Goes through each speckle applies the model and then creates a data
+     * table to show the model weights and values.
+     *
+     */
     void runMeasureSpeckles(){
         HashSet<Speckle> tracking_speckles = new HashSet<Speckle>(trackable_speckles);
 
@@ -385,7 +389,6 @@ public class SpeckleTracker implements Runnable{
         DataTableWindow dtw = new DataTableWindow("Speckle Values");
 
         for(Speckle s: tracking_speckles){
-            System.out.println("speckle");
             ArrayList<Double> xs = new ArrayList<Double>();
             ArrayList<Double> ys = new ArrayList<Double>();
             ArrayList<Double> prob = new ArrayList<Double>();

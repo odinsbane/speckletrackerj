@@ -70,7 +70,7 @@ public class StaticDriftModel extends SpeckleModel{
      * 
      **/
       
-    public SpeckleEstimator estimateLocation(SpeckleEstimator speck,int frame){
+    public void estimateLocation(SpeckleEstimator speck,int frame){
         double[] pt;
         HashSet<Integer> frames = new HashSet<Integer>();
         for(Integer x: speck){
@@ -106,7 +106,6 @@ public class StaticDriftModel extends SpeckleModel{
 
         speck.end();
 
-        return speck;
     }
     
     

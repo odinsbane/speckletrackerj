@@ -195,7 +195,6 @@ public class SpeckleListener implements MouseListener,MouseMotionListener,KeyLis
                 break;
         }
     } else  if(e.getKeyCode()==KeyEvent.VK_ESCAPE){
-        System.out.println("stop");
         parent.endActions();
     } else if(MODE==PLACE_MERGE_MODE||MODE==PLACE_TRACK_MODE){
         //both of these modes have directions enabled.

@@ -62,14 +62,13 @@ public class SpeckleEstimator implements Iterable<Integer>{
      * nearby and
      * 
      * @param weight - {probability, ordering, number, ... }
-     * @param xy
-     * @param frame
+     * @param xy - location double[]{x, y}
+     * @param frame - slice number
      */
     public void setWeights(double[] weight, double[] xy, int frame){
         
         POSITIONS.put(frame,new double[][]{xy,weight});
-        //WEIGHTS.put(frame,weight);
-        
+
     }
     
     public double[] getCoordinates(int frame){
@@ -79,7 +78,6 @@ public class SpeckleEstimator implements Iterable<Integer>{
     }
     
     public double[] getWeight(int frame){
-        //return WEIGHTS.get(frame);
         if(POSITIONS.containsKey(frame))
             return POSITIONS.get(frame)[1];
 
@@ -95,6 +93,7 @@ public class SpeckleEstimator implements Iterable<Integer>{
     public boolean exists(int frame){
         return POSITIONS.containsKey(frame);
     }
+
     /** immediately terminates the estimator */
     public void end(){
         working = false;

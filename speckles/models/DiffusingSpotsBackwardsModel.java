@@ -152,7 +152,7 @@ public class DiffusingSpotsBackwardsModel extends SpeckleModel{
     }
     
     @Override
-    public SpeckleEstimator estimateLocation(SpeckleEstimator speck,int f){
+    public void estimateLocation(SpeckleEstimator speck,int f){
         int frame = speck.getFirstFrame();
         while( frame>1 ){
             frame--;
@@ -161,7 +161,7 @@ public class DiffusingSpotsBackwardsModel extends SpeckleModel{
             //
             if(pts.size()==0){
                 speck.end();
-                return speck;
+                return;
 
             }
             double[] best = new double[]{0,0,0};
@@ -194,14 +194,13 @@ public class DiffusingSpotsBackwardsModel extends SpeckleModel{
 
                 if(speck.getFail()>2){
                     speck.end();
-                    return speck;
+                    return;
                 }
             }
         }
         
         speck.end();
 
-        return speck;
     }
 
     /**

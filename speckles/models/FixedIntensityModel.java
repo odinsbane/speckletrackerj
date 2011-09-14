@@ -67,14 +67,14 @@ public class FixedIntensityModel extends SpeckleModel{
      * @param frame current frame
      * 
      **/
-    public SpeckleEstimator estimateLocation(SpeckleEstimator speck,int frame){
+    public void estimateLocation(SpeckleEstimator speck,int frame){
         if(frame<= SpeckleApp.getSlices(implus)){
             ArrayList<double[]> pts = predictSpeckle(speck, frame);
 
             //
             if(pts.size()==0){
                 speck.end();
-                return speck;
+                return;
 
             }
 
@@ -121,7 +121,6 @@ public class FixedIntensityModel extends SpeckleModel{
 
         }
 
-        return speck;
     }
 
     @Override

@@ -17,7 +17,7 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * Creates model and statistical data
+ * A collection of methods and routines for collecting data, and calculating Intensities.
  *
  *
  * User: mbs207
@@ -29,8 +29,6 @@ public class SpeckleCalculator {
     public static double INNER_RADIUS = 1;
     public static double OUTER_RADIUS = 3;
 
-    //SpeckleDetector sd;
-
     public double size;
     public double thresh;
     public double average;
@@ -40,7 +38,6 @@ public class SpeckleCalculator {
 
     public SpeckleCalculator(HashSet<Speckle> s, ImagePlus imp,double radius){
 
-        //sd = new SpeckleDetector();
         averageValue(s,radius, imp);
         averageAfter(s,radius, imp);
         calculateMaxMeanDisplacement(s);
@@ -50,7 +47,13 @@ public class SpeckleCalculator {
         
     }
 
-
+    /**
+     * Average value of all speckles.
+     *
+     * @param speckles - the coordinate values that will be measured at.
+     * @param radius - the size of circle that will be averaged over.
+     * @param imp - that image stack that will be used.
+     */
     public void averageValue(HashSet<Speckle> speckles,double radius, ImagePlus imp){
         double value = 0;
         double value_sqd = 0;
@@ -75,6 +78,13 @@ public class SpeckleCalculator {
 
     }
 
+    /**
+     * Static version of above method, the size is the INNER_RADIUS value.
+     *
+     * @param speckles - set of speckle/coordinates taht will be sampled at.
+     * @param imp - image stack.
+     * @return average over the area of INNER_RADIUS.
+     */
     public static double averageSpeckleValue(HashSet<Speckle> speckles, ImagePlus imp){
         double value = 0;
         int count = 0;
@@ -96,6 +106,13 @@ public class SpeckleCalculator {
 
     }
 
+    /**
+     * The average intensity for an area immediately after a speckle track has ended.
+     *
+     * @param speckles - the speckles that will be measured.
+     * @param radius - the size of the circle used for measuring.
+     * @param imp - the stack of the images used for measuring.
+     */
     public void averageAfter(HashSet<Speckle> speckles,double radius, ImagePlus imp){
         double value = 0;
         int count = 0;
@@ -115,6 +132,12 @@ public class SpeckleCalculator {
 
     }
 
+    /**
+     *  sets the max_mean_displacement value for all speckles...used in the batchlocate
+     *  learn.
+     *
+     * @param speckles
+     */
     public void calculateMaxMeanDisplacement(HashSet<Speckle> speckles){
 
         max_mean_displacement = 0;
@@ -127,6 +150,11 @@ public class SpeckleCalculator {
 
     }
 
+    /**
+     * Calculates the mean magintude of displacement
+     * @param s the collection of coordinates that will be calculated.
+     * @return
+     */
     public static double calculateMeanDisplacement(Speckle s){
         double d = 0;
         if(s.getSize()>1){
@@ -139,6 +167,14 @@ public class SpeckleCalculator {
         }
         return d;
     }
+
+    /**
+     * Removes speckles with zero points or points outside of the frame of
+     * the image.
+     *
+     * @param speckles - set of speckles to be purged.
+     * @param imp - the image data.
+     */
     public void purgeSpeckles(HashSet<Speckle> speckles,ImagePlus imp){
         Iterator<Speckle> iter = speckles.iterator();
 
@@ -162,27 +198,6 @@ public class SpeckleCalculator {
             double sumB = averageValueCircle(pt,INNER_RADIUS,ipB);;
             double maxB = averageValueAnnulus(pt,INNER_RADIUS,OUTER_RADIUS,ipB);;
 
-
-
-            /*
-            for(int i: box){
-                for(int j: box){
-
-                    double a = ipA.getInterpolatedPixel(pt[0] + i, pt[1] + j);
-                    sumA += a;
-                    if(maxA<a){
-                        maxA = a;
-                    }
-
-                    double b = ipB.getInterpolatedPixel(pt[0] + i, pt[1] + j);
-                    sumB += b;
-                    if(maxB<b){
-                        maxB = b;
-                    }
-                }
-            }
-            */
-
             double average_difference = (sumA - sumB);
             double max_difference = (maxA - maxB);
 
@@ -196,6 +211,13 @@ public class SpeckleCalculator {
 
     }
 
+    /**
+     * Uses one set of speckles as reference, and makes sure that the candidates do not
+     * cross paths with the other speckles.
+     * @param originals set that should not be modified
+     * @param candidates set that has speckles removed
+     * @param proximity minimum distance of approach.
+     */
     public void removeCrossedPaths(HashSet<Speckle> originals, HashSet<Speckle> candidates, double proximity){
 
 
@@ -209,7 +231,6 @@ public class SpeckleCalculator {
                 double d = closestApproach(can, ori);
                 if(d<proximity){
                     iter.remove();
-                    System.out.println("crossed");
                     break;
                 }
 
@@ -247,7 +268,6 @@ public class SpeckleCalculator {
 
             }
 
-            if(remove.size()>0) System.out.println("crossed 2");
             for(Speckle s: remove){
                 remaining.remove(s);
                 candidates.remove(s);
@@ -257,6 +277,11 @@ public class SpeckleCalculator {
 
     }
 
+    /**
+     * calculates the displacement for the first frame of the speckle (why?)
+     * @param s - speckle that is checked
+     * @return - distance moved after first frame(relative to speckle track)
+     */
     public static double stepSize(Speckle s){
         if(s.getSize()>1){
             int i = s.getFirstFrame();
@@ -267,6 +292,14 @@ public class SpeckleCalculator {
         return 0;
     }
 
+    /**
+     * Calculates the closest distance the two speckles are relative to each other
+     * when they exist in the same frame.
+     *
+     * @param a - speckle
+     * @param b - other speckle
+     * @return distance
+     */
     public static double closestApproach(Speckle a, Speckle b){
         double closest = Double.MAX_VALUE;
         Speckle shorter = a.getSize()<b.getSize()?a:b;
@@ -285,6 +318,13 @@ public class SpeckleCalculator {
         return Math.sqrt(closest);
     }
 
+    /**
+     * Average intensity over a circle.
+     * @param pt center of circle.
+     * @param radius - radius of circle
+     * @param ip - image data.
+     * @return average intensity
+     */
     public static double averageValueCircle(double[] pt, double radius, ImageProcessor ip){
         double n = radius*5;
         Ellipse2D el = new Ellipse2D.Double(pt[0] - radius,pt[1] - radius,2*radius, 2*radius);
@@ -310,6 +350,14 @@ public class SpeckleCalculator {
         return integral;
     }
 
+    /**
+     * Calculates the average value over an annulus.
+     * @param pt center of two concentric circles.
+     * @param inner the inner portion that is not counted.
+     * @param outter the outter portion that is counted.
+     * @param ip - the image data.
+     * @return average intensity.
+     */
     public static double averageValueAnnulus(double[] pt, double inner, double outter, ImageProcessor ip){
         double n = outter*5;
         Ellipse2D el = new Ellipse2D.Double(pt[0] - inner,pt[1] - inner,2*inner, 2*inner);
@@ -334,7 +382,14 @@ public class SpeckleCalculator {
         integral = count>0?integral/count:0;
         return integral;
     }
-    
+
+    /**
+     * Create a text window with data that can be used to determine the best combination
+     * of values for the diffusing spot model. These values do not work well.
+     *
+     * @param speckles - speckles to be measured.
+     * @param ip - image stack
+     */
     public static void estimateOptimalParameters(HashSet<Speckle> speckles, ImagePlus ip){
         ImageStack istack = ip.getStack();
         DiffusingSpotsModel m = new DiffusingSpotsModel(ip);
@@ -386,7 +441,6 @@ public class SpeckleCalculator {
         parameters.put("Displacement Weight",dc);
         parameters.put("Change Criteria",cc);
         //m.setParameters(parameters);
-        System.out.println("#recomended: " + ic + "\t" + dc + "\t" + cc);
 
         weights.clear();
         double average_tally = 0;

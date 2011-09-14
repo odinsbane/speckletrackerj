@@ -45,7 +45,6 @@ public class AboutWindow implements HyperlinkListener {
 
     public void hyperlinkUpdate(HyperlinkEvent e) {
          if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                 System.out.println(e.getURL());
 
                 if (Desktop.isDesktopSupported()) {
                       Desktop desktop = Desktop.getDesktop();

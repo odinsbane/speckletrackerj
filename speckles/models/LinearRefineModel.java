@@ -42,7 +42,9 @@ public class LinearRefineModel extends SpeckleModel{
     /**
      *  Initiates a specklemodel factory for generating speckle
      * 
-     **/
+     *
+     * @param imp - reference image stack.
+     */
     public LinearRefineModel(ImagePlus imp){
         this();
         implus = imp;
@@ -84,7 +86,7 @@ public class LinearRefineModel extends SpeckleModel{
      * 
      **/
       
-    public SpeckleEstimator estimateLocation(SpeckleEstimator speck,int frame){
+    public void estimateLocation(SpeckleEstimator speck,int frame){
         double[] pt, npt;
         //add all of the frames before
         
@@ -105,7 +107,6 @@ public class LinearRefineModel extends SpeckleModel{
 
         speck.end();
 
-        return speck;
     }
     
     public double[] refinePt(double[] xy, int radius, ImageProcessor ip){

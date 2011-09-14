@@ -68,7 +68,7 @@ public class StaticSpeckleModel extends SpeckleModel{
      * 
      **/
       
-    public SpeckleEstimator estimateLocation(SpeckleEstimator speck,int frame){
+    public void estimateLocation(SpeckleEstimator speck,int frame){
         double[] pt = speck.getLastCoordinates();
         HashSet<Integer> frames = new HashSet<Integer>();
         for(Integer x: speck){
@@ -82,9 +82,7 @@ public class StaticSpeckleModel extends SpeckleModel{
         }
         speck.end();
         
-        //if(TYPE==SINGLE)
-        //   showSpecklePlots(speck); 
-        return speck;
+
     }
     
     private void showSpecklePlots(SpeckleEstimator speck){

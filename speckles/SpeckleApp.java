@@ -23,17 +23,15 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
 
-//import speckles.controls.SpeckleControls;
 
 /**
- *      Starts the Speckle_Plugin on an image file, tb specified at the command prompt but
- *      for development purposes it will be specified here.
+ *      This is the main speckle plugin app.  It handles all of the callbacks from button
+ *      events.  Starting and stoping tracking.  And maintaining speckle track integrity.
+ *
+ *      There is some legacy code in here that is on its way out.
  *
  **/
 public class SpeckleApp{
-    
-    
-    //static final int RADIUS = 4;        //Radius for drawing speckles
 
     /**
        *    The two ways to store speckle data will be, one keeps track of the underlying speckles
@@ -41,8 +39,8 @@ public class SpeckleApp{
        *    
        **/
        
-    public static String VERSION = "0.85";
-    public static String DATE = "9/7/2011";
+    public static String VERSION = "0.86";
+    public static String DATE = "9/14/2011";
     
     HashSet<Speckle> AllSpeckles,       //Stores all of the speckle data.
                      proof_speckles,    //used for the autolocate slider for drawing speckles
@@ -60,6 +58,7 @@ public class SpeckleApp{
     
     TrackerThread TRACKER;
     AnimationThread ANIMATOR;
+    
     //Speckle Colors
     public static final Color NORMAL_COLOR = new Color(0xff9999);
     public static final Color PREVIOUS_COLOR = new Color(0x0000ff);
@@ -120,17 +119,19 @@ public class SpeckleApp{
     }
 
     /**
-    *     Starts the program for an ImagePlus, which is either supplied from a file dialog or supplied by
-    *     ImageJ if the program is started as an imagej plugin.
+    *     Starts the program with out an existing image Plus.  If the program is
+    *     started from the command line a file dialog opens to select an image.
+    *     If the program is started via the ImageJ plugin, then the selected
+     *    ImagePlus is subsequently loaded via the plugin.
     *
-    * @param close_on_exit closing the speckle tracker ends the program.
+    *   @param close_on_exit closing the speckle tracker ends the program.
     */
     public SpeckleApp(boolean close_on_exit){
         lookAndFeel();
         specials = new HashMap<Speckle,int[]>();
         ImageStack is = new ImageStack(200,200);
         is.addSlice("dummy",new FloatProcessor(200,200));
-        this.working_plus = new ImagePlus("loading screen",is);                               //Original imageplus
+        this.working_plus = new ImagePlus("loading screen",is);  //Original imageplus
         working_bounds = new Rectangle2D.Double(0,0,working_plus.getWidth(), working_plus.getHeight());
 
         working_stats = working_plus.getStatistics();
@@ -164,6 +165,11 @@ public class SpeckleApp{
 
     }
 
+    /**
+     * Sets the current ImagePlus (image data).
+     *
+     * @param original_plus the data that will be used, this ImagePlus does not need to be displayed.
+     */
     public void loadImage(ImagePlus original_plus){
 
 
@@ -186,26 +192,41 @@ public class SpeckleApp{
 
     }
 
+    /**
+     * Makes the controls inactive and the progress bar run.
+     */
     public void setWaiting(){
         speckle_controls.setWaiting();
         speckle_controls.showMessage("Loading Image ...");
         speckle_controls.setRunning(true);
     }
-    
+
+    /**
+     *
+     * @return mean value of the working image plus.
+     */
     public double getMean(){
         return working_stats.mean;
     }
-    
+
+    /**
+     *
+     * @return number of slices in the current image plus.
+     */
     public int getMaxSlice(){
         return getSlices(working_plus);
     }
-    
+
+    /**
+     *
+     * @return current slice
+     */
     public int getCurrentSlice(){
         return CUR;
     }
     
     /**
-     * creates a new specke with the center at x,y
+     * creates a new speckle with the center at x,y
      *
       * @param x pos x
      * @param y pos y
@@ -326,7 +347,11 @@ public class SpeckleApp{
     
     /**
       *     Draws a speckle with color set as a parameter
-      **/
+     *
+     * @param speck - speckle that will be drawn
+     * @param color - the color to be used
+     * @param frame - which frame the coordinates will be taken from
+     */
     void drawSpeckle(Speckle speck, Color color, int frame){
         if(speck.exists(frame)){
             draw_panel.addEllipse(speck.getShape(frame),color);
@@ -387,9 +412,10 @@ public class SpeckleApp{
     }
     
     /**
-      *     Toggles previous speckles
+      *     Toggles showing previous speckles.
+     *     **not used**
       **/
-    public void togglePrevious(){
+    public void togglePrevious_(){
         DRAWPREVIOUS = !DRAWPREVIOUS;
         updateSpeckleImage();
     }
@@ -417,7 +443,9 @@ public class SpeckleApp{
     
     /**
       *     Convenience for use with the slider bar
-      **/
+     *
+     * @param n slice to be set to.
+     */
     public void setImageSlice(int n){
         CUR = n;
         
@@ -455,7 +483,13 @@ public class SpeckleApp{
         }
         
     }
-    
+
+    /**
+     * Creates a stack of images from the square region cropped out around the
+     * end of a speckle mark.  The frame relative is the frame number relative
+     * to the last frame.
+     * 
+     */
     public void createDisappearanceStack(){
         
         int relative = speckle_controls.getRelative();
@@ -494,7 +528,10 @@ public class SpeckleApp{
         
         
     }
-    
+
+    /**
+     * Create a stack of images near the start
+     */
     public void createAppearanceStack(){
         
         int relative = speckle_controls.getRelative();
@@ -535,7 +572,11 @@ public class SpeckleApp{
     
         
     }
-    
+
+    /**
+     * Create a stack of images that are neither, appearance or disappearance.
+     *
+     */
     public void createNormalStack(){
         
         int relative = speckle_controls.getRelative();
@@ -574,7 +615,16 @@ public class SpeckleApp{
         
         
     }
-    
+
+    /**
+     * A utility method for cropping images, especially used when
+     * creating stacks
+     *
+     * @param now_proc - processor to be cropped.
+     * @param pt - center of cropped region.
+     * @param square_size - half-width of region to be cropped.
+     * @return - image data of cropped region.
+     */
     public ImageProcessor cropRegion(ImageProcessor now_proc, double[] pt, int square_size){
         ImageProcessor x = null;
         if( 
@@ -614,7 +664,13 @@ public class SpeckleApp{
         updateSpeckleImage();
 
     }
-    
+
+    /**
+     * For determining what color the speckle should be painted.
+     * @param speck track that will be evaluated
+     * @param f frame
+     * @return integer corresponding to type.
+     */
     public int getType(Speckle speck, int f){
         if(speck.getFirstFrame()==f)
             return Speckle.APPEARANCE_SPECKLE;
@@ -708,6 +764,9 @@ public class SpeckleApp{
 
     }
 
+    /**
+     * Removes all speckles.
+     */
     public void newSpeckles(){
         int test = JOptionPane.OK_OPTION;
         if(speckle_controls.checkChange())
@@ -722,7 +781,10 @@ public class SpeckleApp{
         speckle_controls.clearChange();        
         
     }
-    
+
+    /**
+     * Starts the autolocate based on threshold.
+     */
     public void thresholdLocate(){
 
 
@@ -759,16 +821,26 @@ public class SpeckleApp{
         }
 
     }
-    
+
+    /**
+     * when the slider moves.
+     */
     public void sliderUpdate(){
     
         setImageSlice(speckle_controls.getSliderValue());
     
     }
+
+    /**
+     * For keeping the display up to date.
+     */
     public void updateStatus(){
         speckle_controls.updateStatus();
     }
-    
+
+    /**
+     * Trackes the selected speckle.
+     */
     public void trackSpeckle(){
         Speckle s = SELECTED;
         if(s != null){
@@ -792,8 +864,11 @@ public class SpeckleApp{
         }
         purgeSpeckles();
     }
-    
-    
+
+    /**
+     * Merge two speckle tracks, the selected track
+     * and another track to be decided. Can create discontinuous tracks.
+     */
     public void mergeSpeckles(){
         Speckle s = SELECTED;
         if(s!=null){
@@ -809,7 +884,13 @@ public class SpeckleApp{
 
         }
     }
-    
+
+    /**
+     * Merges two speckles, removes overlapping frames by taking
+     * the dominant speckle tracks frames.
+     * @param a - dominant speckle track
+     * @param b - subordinate
+     */
     public void mergeSpeckles(Speckle a, Speckle b){
         if(a!=b){
             for(Integer i: a){
@@ -822,15 +903,27 @@ public class SpeckleApp{
         selectSpeckle(b);
     }
 
+    /**
+     * For enabling the directions to change image slice when
+     * the rest of the ui is disabled.
+     */
     public void enableDirections(){
         speckle_controls.enableDirections();
     }
+
+    /**
+     * Change the speckle shape to the next speckle shape.
+     * Circles, X's or nothing.
+     */
     public void toggleSpeckleShape(){
 
         draw_panel.nextSpeckleShape();
 
     }
 
+    /**
+     * Sets UI look and feel.
+     */
     public static void lookAndFeel(){
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -846,6 +939,12 @@ public class SpeckleApp{
 
     }
 
+    /**
+     * Loads an image plus with the given path.  If the
+     * image plus is null it will show an error message.
+     *
+     * @param file_name - path of the file that will be opened.
+     */
     public void loadImage(String file_name){
         final String fname = file_name;
         TRACKER.submit(
@@ -875,6 +974,9 @@ public class SpeckleApp{
 
     }
 
+    /**
+     * To indicate that speckles do not need to be saved.
+     */
     public void clearSpeckleMod(){
         TRACKER.submit(new Runnable(){
            public void run(){
@@ -883,6 +985,10 @@ public class SpeckleApp{
         });
     }
 
+    /**
+     * Start it from scratch.
+     * @param args cmd line args.
+     */
     public static void main(String[] args){
         try{
             //x.show();
@@ -940,35 +1046,6 @@ public class SpeckleApp{
     
     }
 
-    /**
-       *    Places speckles in their appropriate frames.  Removes them if they don't exist anymore
-       **/
-    public synchronized void purgeSpeckles(HashSet<Speckle> coarse){
-
-        /** remove size zero speckles */
-        ArrayList<Speckle> none = new ArrayList<Speckle>();
-        ArrayList<Integer> bad_pts = new ArrayList<Integer>();
-
-        for(Speckle s: coarse){
-            bad_pts.clear();
-            for(Integer i: s){
-                double[] d = s.getCoordinates(i);
-                if(!working_bounds.contains(d[0],d[1])){
-                    bad_pts.add(i);
-                }
-            }
-            for(Integer i: bad_pts)
-                s.removePoint(i);
-
-            if(s.getSize()==0)
-                none.add(s);
-        }
-        for(Speckle s: none)
-            coarse.remove(s);
-
-        
-    }
-
     public void verifySelected(){
         if(SELECTED!=null&&SELECTED.getSize()==0)
             SELECTED=null;
@@ -996,7 +1073,13 @@ public class SpeckleApp{
         specials.put(speck,new int[]{Speckle.PREVIOUS_SPECKLE, n});
 
     }
-    
+
+    /**
+     * Shows the position of this speckle in the next frame, on the current
+     * image.
+     *
+     * @param speck mark that will be displayed.
+     */
     public void showSpeckleFromNext(Speckle speck){
         int n = speck.exists(CUR+1)?CUR+1:speck.getFirstFrame();
         drawSpeckle(speck,PREVIOUS_COLOR,n);
@@ -1116,9 +1199,9 @@ public class SpeckleApp{
     /**
      * Called back after an autolocate.
      *
-     * @param thresh
-     * @param proximity
-     * @param size
+     * @param thresh - threshold value for creating binary image
+     * @param proximity - distance value 
+     * @param size - minimum size
      */
     public void finishedLocate(double thresh, double proximity, double size){
 
@@ -1131,18 +1214,31 @@ public class SpeckleApp{
         endActions();
         
     }
-    
+
+    /**
+     * If an auto locate was cancelled, stops showing proof speckles
+     * and enables the UI.
+     *
+     */
     public void cancelledLocate(){
 
         PROOFING=false;
         endActions();
     }
 
+    /**
+     * If the batchtrack routine was cancelled.
+     * @param bts the dialog
+     */
     public void cancelledLocate(BatchTrackingStarter bts){
         PROOFING=false;
         bts.cancelAcquire();
     }
-    
+
+    /**
+     * Crops a region around ever frame of the selected speckle.
+     *
+     */
     public void showSpeckleAllFrames(){
         Speckle s = SELECTED;
         if(s!=null){
@@ -1156,9 +1252,14 @@ public class SpeckleApp{
             speckle_controls.setWaiting();
 
         }
-    
+
     }
-    
+
+    /**
+     * Shows this speckle in its own imageplus with the size from the analysis
+     * window.
+     * @param s speckle that will be shown.
+     */
     public void showSpeckleAllFrames(Speckle s){
         TreeSet<Integer> indicies = new TreeSet<Integer>();
         for(Integer i: s)
@@ -1192,7 +1293,10 @@ public class SpeckleApp{
         
         endActions();
     }
-    
+
+    /**
+     * Deletes the currently selected speckle.
+     */
     public void deleteSpeckle(){
         Speckle s = SELECTED;
         if(s!=null){
@@ -1206,7 +1310,11 @@ public class SpeckleApp{
         }
     
     }
-    
+
+    /**
+     * Removes speckle from program irretrievably
+     * @param s - candidate
+     */
     public void deleteSpeckle(Speckle s){
         
         s.clear();
@@ -1214,23 +1322,33 @@ public class SpeckleApp{
         endActions();
         
     }
-    
+
+    /**
+     * gets the panel containing the image.
+     * @return jpanel that the image is drawn on.
+     */
     public JPanel getImagePanel(){
     
         return draw_panel;
         
     }
-    
+
+    /**
+     * zoom in image
+     */
     public void zoomIn(){
         draw_panel.zoomIn();
     }
-    
+
+    /**
+     * zoom out image.
+     */
     public void zoomOut(){
         draw_panel.zoomOut();
     }
 
     /**
-     *  A new version of start batch locate that uses speckles to determin if
+     *  Starts batch locate by bringing up a dialog.
      */
     public void startBatchLocate(){
         //make sure they aren't using a refine model when they batch locate.
@@ -1270,65 +1388,21 @@ public class SpeckleApp{
         }
 
     }
-    /**
-     *  This begins the process of track/locate every frame in the image.
-     *
-     */
-    public void startBatchLocateB(){
-        
-        proof_speckles = new HashSet<Speckle>();
-        speckle_controls.setDialogWaiting();
-        
-        
-        ImageProcessor filtered = working_proc.duplicate();
-        
-        PROOFING=true;
-        
-        AutoLocateSlider slides = new AutoLocateSlider(proof_speckles, CurrentSpeckles,filtered, this );
-        
-        speckle_controls.setRunning(true);
-        
-        java.awt.EventQueue.invokeLater(slides);
-        
-    }
 
+    /**
+     * Starts the batch locate routine.
+     */
     public void batchLocate(){
 
         SpeckleCalculator sc = new SpeckleCalculator(AllSpeckles,working_plus,3);
         batchLocate(sc);
     }
 
-
-    /**
-     * This recieves the call back for batch locations.  Step 1 get OFF of the EventQueue.
-     *
-     * @param thresh threshold value from slider
-     * @param min_distance minimum distance squared, from slider
-     * @param size minimum size of the located speckles.
-     *
-     * */
-    public void updateBatchLocate(double thresh, double min_distance, double size){
-
-        final double t = thresh;
-        final double m = min_distance;
-        final double s = size;
-        //do not get the lock in the tracker thread
-        try{
-            LOCK.get();
-        }catch(ConcurrentModificationException e){
-            System.out.println("Already Tracking...Should be disabled.");
-            return;
-        }
-
-        TRACKER.submit(new Runnable(){public void run(){ batchLocate();}});
-
-    }
-
     /**
      * This runs the batch locate, it better be off of the event queue by now.
      *
      *
-     * @param sc outdated but it distinguishes.
+     * @param sc outdated but it distinguishes the two batch locate methods.
      */
     public void batchLocate(SpeckleCalculator sc){
         double thresh = PARAMETERS.get(SpeckleParameters.thresholdValue);
@@ -1383,17 +1457,13 @@ public class SpeckleApp{
             ImageProcessor t = SpeckleDetector.threshold(local_processor, thresh);
             
             current = sd.getCentroids(t);
-            //if(current.size()==1 && current.get(0)[2]>20){
-            //    System.out.println("cracked");
-            //    break;
-
-           // }
 
 
             speckle_controls.showMessage(started + ", total: " + saved.size() + ", found: " + current.size());
 
 
             cullCentroidsToRegion(current,rect);
+
             //keep the largest of the centroids that are too close together.
             ArrayList<double[]> isolated = new ArrayList<double[]>();
 
@@ -1477,16 +1547,11 @@ public class SpeckleApp{
             SpeckleTracker.stateTrackSpeckle(saved, trackable ,working_plus, local_model, current_frame).run();
             SpeckleTracker.stateTrackSpeckle(saved, trackable ,working_plus, refiner, current_frame).run();
 
-            //for(Speckle s: trackable)
-                //if(s.getSize()>2) SpeckleTracker.autoTrackSpeckle(s ,working_plus, correlated).run();
-            //SpeckleTracker.stateTrackSpeckle(saved, trackable ,working_plus, refiner, current_frame).run();
 
             if(PARAMETERS.get(SpeckleParameters.fusionSwitch)>0)
                 calc.purgeSpeckles(trackable,working_plus);
 
-            //calc.removeCrossedPaths(saved,trackable,min_dist);
-
-
+            
             Iterator<Speckle> iter = trackable.iterator();
 
             
@@ -1687,7 +1752,12 @@ public class SpeckleApp{
         }
 
     }
-    
+
+    /**
+     * Brings up an imagej window.  For use if the program was started w/out
+     * imagej.  It will also show the imageplus corresponding to the curreint image.
+     *
+     */
     public void startImageJ(){
         if(IJ.getInstance()==null)
             new ImageJ();
@@ -1703,10 +1773,18 @@ public class SpeckleApp{
         a.setVisible(true);
     }
 
+    /**
+     * updates the selector table data..
+     */
     public void updateSelector(){
         speckle_controls.updateSelector(AllSpeckles);
     }
 
+    /**
+     * Button call back that initiates the data table update routine, which
+     * can be resource intensive.
+     *
+     */
     public void updateSelectorButton(){
         speckle_controls.showMessage("updating data table");
         speckle_controls.setWaiting();
@@ -1719,24 +1797,42 @@ public class SpeckleApp{
         });
         TRACKER.finish();
     }
+
+    /**
+     *
+     * @return the currently selected speckle.
+     */
     public Speckle getSelected(){
         return SELECTED;
     }
 
+    /**
+     * During initilization startes a thread which is the main loop.
+     */
     synchronized void startTrackerThread(){
         TRACKER = new TrackerThread(this);
         TRACKER.start();
     }
 
+    /**
+     * Changes to the next model.
+     */
     public void nextModel(){
         speckle_controls.nextModel();
         modelChanged();        
     }
+
+    /**
+     * Changes to the previous model.
+     */
     public void previousModel(){
         speckle_controls.previousModel();
         modelChanged();
     }
 
+    /**
+     * For playing through the image.
+     */
     public void startAnimation(){
 
         if(ANIMATOR.running){
@@ -1756,18 +1852,28 @@ public class SpeckleApp{
 
     }
 
+    /**
+     * for selecting a region.
+     */
     public void startSelection(){
 
         draw_panel.requestSelection();
 
     }
 
+    /**
+     * clears the selected region.
+     */
     public void clearSelection(){
 
         draw_panel.clearSelection();
 
     }
 
+    /**
+     * Call back after editing parameters is finished with the
+     * accept button.
+     */
     public void changeParameters(){
         TRACKER.submit(new Runnable() {
             public void run() {
@@ -1785,6 +1891,10 @@ public class SpeckleApp{
         });
     }
 
+    /**
+     * Initializes global parameters.
+     *
+     */
     public void initializeParameters(){
 
         PARAMETERS.put(SpeckleParameters.proximityValue,SpeckleTracker.MIN_TRACK_SEPARATION);
@@ -1801,6 +1911,11 @@ public class SpeckleApp{
 
     }
 
+    /**
+     * If there is a selected region only use selected region for detecting speckles.
+     *
+     * @param cents array list of centroids that will be culled.
+     */
     public void cullCentroidsToSelectedRegion(ArrayList<double[]> cents){
         if(draw_panel.hasSelection()){
             Iterator<double[]> iter = cents.iterator();
@@ -1813,6 +1928,13 @@ public class SpeckleApp{
         }
 
     }
+
+    /**
+     * Removes all centroids from the List that are not contained w/in
+     * the rectangle.
+     * @param cents - centroids to be culled.
+     * @param rect - area that is acceptable.
+     */
     public void cullCentroidsToRegion(ArrayList<double[]> cents,Rectangle2D rect){
         if(draw_panel.hasSelection()){
             Iterator<double[]> iter = cents.iterator();
@@ -1824,6 +1946,12 @@ public class SpeckleApp{
         }
 
     }
+
+    /**
+     * Selected region area.
+     *
+     * @return rectangular reguin that represents the selected area.
+     */
     public Rectangle2D getSelectedRegion(){
 
         if(draw_panel.hasSelection()){
@@ -1834,6 +1962,10 @@ public class SpeckleApp{
         
     }
 
+    /**
+     * Gets all speckles that are in the selected region.
+     * @return a subset of the existing speckle tracks that are contained in the selected region.
+     */
     public HashSet<Speckle> cullSpecklesToSelectedRegion(){
         HashSet<Speckle> track_dogs = new HashSet<Speckle>();
         if(draw_panel.hasSelection()){
@@ -1864,6 +1996,11 @@ public class SpeckleApp{
         return LOCK.isInterrupted();
     }
 
+    /**
+     * Displays an image plus with a resliced version of the current image.
+     *
+     * @return new reslice control with geometry based on the current image.
+     */
     public ResliceControl startResliceControl(){
         if(reslice_control==null)
             reslice_control =  new ResliceControl("Reslice Control", this,working_plus.getStack());
@@ -1873,6 +2010,10 @@ public class SpeckleApp{
         return reslice_control;
     }
 
+    /**
+     * Shows the reslice control, and draws the representitive speckle tracks on the
+     * image.
+     */
     public void showResliceControl(){
         try{
             LOCK.get();
@@ -1898,11 +2039,20 @@ public class SpeckleApp{
 
     }
 
-
+    /**
+     * Redraws speckle tracks onto reslice control, only including the
+     * tracks that are in the selected region.
+     */
     public void updateResliceSpeckles(){
         reslice_control.updateSpeckles(cullSpecklesToSelectedRegion());
     }
 
+    /**
+     * Gets the closest speckle to the provided speckle
+     * @param s speckle that is being searched for.
+     * @param v an array for storing the distance to the nearest speckle track
+     * @return the speckle track that is closest.
+     */
     public Speckle getClosestSpeckle(Speckle s, double[] v){
         double min = Double.MAX_VALUE;
         Speckle closest = null;
@@ -1927,14 +2077,19 @@ public class SpeckleApp{
     }
 
 
-
+    /**
+     * set the application visible
+     * @param t show/hide the main controls.
+     */
     public void setVisible(boolean t){
 
         speckle_controls.setVisible(t);
 
     }
 
-
+    /**
+     * Copies the data table to a text window.
+     */
     public void copySelectorToTextWindow() {
         speckle_controls.copySelectorToTextWindow();
 
@@ -1983,6 +2138,15 @@ public class SpeckleApp{
 
     }
 
+    /**
+     * Call back after using an autolocate dialog to obtain parameters for the
+     * batch track starter.
+     *
+     * @param thresh threshold value for determining new candidates
+     * @param proximity minimum distance
+     * @param size minimum size of centroid that will be kept.
+     * @param bts dialog that started process.
+     */
     public void finishAcquire(double thresh, double proximity, double size,BatchTrackingStarter bts){
 
 
@@ -2019,13 +2183,21 @@ public class SpeckleApp{
 
     }
 
+    /**
+     * Get number of slices in an image file.  Uses size of stack not getNSlices.
+     * @param imp image data
+     * @return number of slices in the stack.
+     */
     static public int getSlices(ImagePlus imp){
 
         return imp.getStack().getSize();
 
     }
 
-
+    /**
+     * Turns the currently selected speckle track into two tracks.  The current
+     * frame is added to the later speckle.
+     */
     public void splitSpeckle() {
         if(SELECTED!=null){
             if(SELECTED.getFirstFrame()<getCurrentSlice()&&SELECTED.getLastFrame()>=getCurrentSlice()){
@@ -2048,6 +2220,10 @@ public class SpeckleApp{
         }
     }
 
+    /**
+     * Opens a dialog to get more speckles to append to existing speckles.
+     * 
+     */
     public synchronized void appendSpeckles(){
         int test = JOptionPane.OK_OPTION;
         if(speckle_controls.checkChange())

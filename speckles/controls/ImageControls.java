@@ -171,6 +171,7 @@ class ImageControls implements ChangeListener{
             loop.start();
         }
         volatile Object pressed = new Object();
+        volatile Object mypressed;
         int direction = 0;
         
         /**
@@ -181,7 +182,7 @@ class ImageControls implements ChangeListener{
          */
         public void mousePressed(MouseEvent e){ 
             JButton src = (JButton)e.getSource();
-            pressed = new Object();
+            setPressed();
             if(src.getActionCommand()=="forward"){
                 direction = 1;
                 loop.post(this);
@@ -192,27 +193,22 @@ class ImageControls implements ChangeListener{
         }
         
         /**
-          *     A Local variable mypress is set to be the class member pressed, and so long as no other process
-          *     changes the class variable the following loop will proceed
+          *     When a button is pressed a
           **/
-          
         public void run(){
-            Object mypress = pressed;
+            //Object mypress = pressed;
             int set = 0;
-            while(pressed==mypress){
+            while(pressed==mypressed){
             
-                if(set==0){                 //delay before repeating
-                    
-                    //try/catch statement because of the thread.
+                if(set==0){
+                    //long delay before starting fast scroll
                     try{
-                    
-                        Thread.sleep((long)750,20);
+                        Thread.sleep(750,20);
                         set = 1;
-                    
                     } catch(Exception exc){
 
                         set = 0;
-                        mypress = new Object();
+                        mypressed = new Object();
 
                     }
                     
@@ -221,29 +217,37 @@ class ImageControls implements ChangeListener{
                     //short delay to make sure the program isn't bogged down.
                     try {
                     
-                        Thread.sleep((long)25,20);
+                        Thread.sleep(25,20);
                        
                     } catch(Exception exc){
                        
-                       mypress = new Object();
+                       mypressed = new Object();
 
                     }
                     
                     image_slider.setValue(image_slider.getValue()+direction);
-                    }
+                }
             }
 		}
         
     /**
-      *     Creates a new object thus terminating any pending  repeats
-      **/
-      
-    public void mouseReleased(MouseEvent ee)
-		{
+     *     Creates a new object thus terminating any pending  repeats
+     *
+     * @param ee
+     */
+    public void mouseReleased(MouseEvent ee){
             pressed = new Object();
 		}
+
+    synchronized public void setPressed(){
+        pressed = new Object();
+        mypressed = pressed;
+    }
+
     
     }
+
+
 
     public void setEnabled(boolean v){
         image_slider.setEnabled(v);

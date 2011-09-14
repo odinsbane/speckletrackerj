@@ -144,12 +144,11 @@ public class RemoveCandidates extends SpeckleModel {
 
     }
     @Override
-    public SpeckleEstimator estimateLocation(SpeckleEstimator speck, int frame) {
+    public void estimateLocation(SpeckleEstimator speck, int frame) {
         if(remove.contains(speck.getSpeckle())||speck.getSize()<MINIMUM_DURATION||testMeanDisplacement(speck)){
             speck.removeSpeckle();
         }
         speck.end();
-        return speck;
     }
 
     /**

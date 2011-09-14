@@ -2,6 +2,7 @@ package speckles.models;
 
 import ij.process.ImageProcessor;
 import speckles.Speckle;
+import speckles.SpeckleCalculator;
 import speckles.SpeckleDetector;
 
 import java.util.HashSet;
@@ -24,18 +25,17 @@ public class AdjustModel extends SpeckleModel{
     }
 
     @Override
-    public SpeckleEstimator estimateLocation(SpeckleEstimator speck, int frame) {
+    public void estimateLocation(SpeckleEstimator speck, int frame) {
 
         for(int i: speck){
             ImageProcessor ip = implus.getStack().getProcessor(i);
             double[] w = speck.getCoordinates(i);
             double[] npt = SpeckleDetector.refinePt(w,2,ip);
-
-            speck.setWeights(new double[]{1,i},npt,i);
+            double d = SpeckleCalculator.averageValueCircle(npt,SpeckleCalculator.INNER_RADIUS,ip);
+            speck.setWeights(new double[]{1,d},npt,i);
         }
         speck.end();
-        return speck;
-        
+
     }
 
     /**

@@ -8,7 +8,8 @@ import speckles.SpeckleDetector;
 import java.util.HashSet;
 
 /**
- * New imagej plugin that ...
+ * Model for adjusting the position of speckles.
+ * 
  * User: mbs207
  * Date: Nov 23, 2010
  * Time: 2:35:21 PM

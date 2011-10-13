@@ -90,7 +90,8 @@ public class GaussianFit extends SpeckleModel{
             
             pt = speck.getCoordinates(i);
             npt = refinePt(pt, implus.getStack().getProcessor(i));
-            weights = new double[] {1,npt[2]};
+
+            weights = new double[] {1,npt[2], npt[3], npt[4]};
             speck.setWeights(weights, new double[] {npt[0], npt[1]}, i);
         
             if(SpeckleApp.isStopped()) break;
@@ -159,7 +160,6 @@ public class GaussianFit extends SpeckleModel{
          TreeSet<FitResults> works= new TreeSet<FitResults>(new FitComparator());
 
 
-
         while(crawler.crawling){
             double sigma = crawler.sigma;
             //assume original guess is +- a pixel
@@ -172,7 +172,7 @@ public class GaussianFit extends SpeckleModel{
             works.add(fitLocation(0,-start_delta, sigma, space));
 
             if(works.size()==1){
-                return new double[] { xy[0], xy[1], crawler.sigma};
+                return new double[] { xy[0], xy[1], crawler.sigma, 0, 0};
             }
 
             //scan x-y values get the best x-y value, get the best error for a particular sigma
@@ -197,13 +197,13 @@ public class GaussianFit extends SpeckleModel{
             }
             crawler.step(first);
             if(crawler.sigma<MIN_SIGMA||crawler.sigma>MAX_SIGMA){
-                return new double[] { xy[0], xy[1], crawler.sigma};
+                return new double[] { xy[0], xy[1], crawler.sigma, 0, 0};
             }
 
         }
 
         FitResults best = crawler.results[0];
-        return new double[] { xy[0] + best.x, xy[1] + best.y, crawler.sigma};
+        return new double[] { xy[0] + best.x, xy[1] + best.y, crawler.sigma, best.A, best.B};
         
         
     }

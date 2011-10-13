@@ -114,7 +114,7 @@ public class SpeckleTracker implements Runnable{
         return tracker;
     }
 
-    public static SpeckleTracker measureSpeckles(HashSet<Speckle> all_speckles,HashSet<Speckle> tracking_speckles, ImagePlus implus, SpeckleModel mod, int start){
+    public static SpeckleTracker measureSpeckles(HashSet<Speckle> all_speckles,Speckle selected, ImagePlus implus, SpeckleModel mod, int start){
 
         SpeckleTracker tracker = new SpeckleTracker(implus, mod){
             public void run(){
@@ -122,7 +122,8 @@ public class SpeckleTracker implements Runnable{
             }
         };
         tracker.all_speckles = all_speckles;
-        tracker.trackable_speckles = tracking_speckles;
+        tracker.trackable_speckles = new HashSet<Speckle>();
+        tracker.trackable_speckles.add(selected);
         tracker.start = start;
         tracker.TYPE = STATE_TRACK;
         return tracker;
@@ -382,28 +383,42 @@ public class SpeckleTracker implements Runnable{
      *
      */
     void runMeasureSpeckles(){
-        HashSet<Speckle> tracking_speckles = new HashSet<Speckle>(trackable_speckles);
 
         createModel(all_speckles);
-        int working_dex = start + 1;
         DataTableWindow dtw = new DataTableWindow("Speckle Values");
 
-        for(Speckle s: tracking_speckles){
+        for(Speckle s: trackable_speckles){
             ArrayList<Double> xs = new ArrayList<Double>();
             ArrayList<Double> ys = new ArrayList<Double>();
             ArrayList<Double> prob = new ArrayList<Double>();
-            ArrayList<Double> w = new ArrayList<Double>();
+            ArrayList<ArrayList<Double>> additional_weights = new ArrayList<ArrayList<Double>>();
             ArrayList<Double> frame = new ArrayList<Double>();
             SpeckleEstimator e = new SpeckleEstimator(s);
-            SPECKLE_MODEL.estimateLocation(e, working_dex);
+
+            boolean first = true;
             for(int i: e){
+
+                //estimates the location. Refine models will do everything the first time
+                if(e.isWorking())
+                    SPECKLE_MODEL.estimateLocation(e,i);
+                
                 double[] weights = e.getWeight(i);
+                if(first){
+                    int n = weights.length-1;
+                    for(int j = 0; j<n; j++){
+                        additional_weights.add(new ArrayList<Double>());
+                    }
+                    first=false;
+                }
                 double[] position = e.getCoordinates(i);
 
                 xs.add(position[0]);
                 ys.add(position[1]);
                 prob.add(weights[0]);
-                w.add(weights[1]);
+                for(int j = 0; j<additional_weights.size(); j++){
+                    final ArrayList<Double> w = additional_weights.get(j);
+                    w.add(weights[1+j]);
+                }
                 frame.add((double)i);
 
             }
@@ -412,7 +427,10 @@ public class SpeckleTracker implements Runnable{
             dtw.addColumn("x",xs);
             dtw.addColumn("y",ys);
             dtw.addColumn("probability",prob);
-            dtw.addColumn("weight",w);
+            for(int j = 0; j<additional_weights.size(); j++){
+                final ArrayList<Double> w = additional_weights.get(j);
+                dtw.addColumn("weight-" + j,w);
+            }
 
             
 

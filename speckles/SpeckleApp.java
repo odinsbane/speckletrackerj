@@ -39,8 +39,8 @@ public class SpeckleApp{
        *    
        **/
        
-    public static String VERSION = "0.86";
-    public static String DATE = "9/14/2011";
+    public static String VERSION = "0.87";
+    public static String DATE = "10/11/2011";
     
     HashSet<Speckle> AllSpeckles,       //Stores all of the speckle data.
                      proof_speckles,    //used for the autolocate slider for drawing speckles
@@ -2173,9 +2173,8 @@ public class SpeckleApp{
             return;
         }
 
-        HashSet<Speckle> selected = cullSpecklesToSelectedRegion();
-
-        TRACKER.submit(SpeckleTracker.measureSpeckles(AllSpeckles, selected ,working_plus, MODEL, CUR));
+        //HashSet<Speckle> selected = cullSpecklesToSelectedRegion();
+        TRACKER.submit(SpeckleTracker.measureSpeckles(AllSpeckles, SELECTED ,working_plus, MODEL, CUR));
         TRACKER.finish();
 
         

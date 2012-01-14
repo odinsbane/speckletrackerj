@@ -27,7 +27,15 @@ public class SpeckleWriter{
             return null;
     }
 
-    //Save File dialog
+    /**
+     * Old method
+     *
+     * @depracated
+     *
+     * @param parent
+     * @param title
+     * @return
+     */
     public static String getSaveFileName(Frame parent, String title){
         FileDialog fd = new FileDialog(parent,"Save CSV File",FileDialog.SAVE);
         fd.setFile(title + "_speckles.csv");
@@ -40,10 +48,41 @@ public class SpeckleWriter{
         else
             return null;
     }
-    
+
     /**
-       *    Creates a dialog for saving speckles.
-       **/
+     * New method for saving a file.
+     *
+     * @param parent
+     * @param original
+     * @return
+     */
+    public static String getSaveFileName(Frame parent, File original){
+        
+        FileDialog fd = new FileDialog(parent,"Save CSV File",FileDialog.SAVE);
+        fd.setFile(original.getName());
+        fd.setDirectory(original.getPath());
+
+        fd.setVisible(true);
+        String fname = fd.getFile();
+        String dirname = fd.getDirectory();
+        String fullname = dirname +  fname;
+        if(fname!=null)
+            return fullname;
+        else
+            return null;
+    }
+
+    /**
+     *     Creates a dialog for saving speckles. Since other plugins
+     *     use this method it is not removed.
+     *
+     *@depracated
+     *
+     * @param speckle_set
+     * @param parent
+     * @param title
+     * @return
+     */
     public static boolean writeCSVSpeckles(HashSet<Speckle> speckle_set, Frame parent,String title){
         
         String fname = getSaveFileName(parent,title);
@@ -59,7 +98,32 @@ public class SpeckleWriter{
         }
         return false;
     }
-    
+
+    /**
+     *    Creates a dialog for saving speckles. If the write is successful
+     *    returns the file object that was written too.
+     *
+     *
+     * @param speckle_set speckles to be saved.
+     * @param parent frame for handling dialogs.
+     * @param speckle_file original speckle file.
+     * @return
+     */
+    public static File writeCSVSpeckles(HashSet<Speckle> speckle_set, Frame parent,File speckle_file){
+
+        String fname = getSaveFileName(parent,speckle_file);
+        if(fname!=null){
+            try{
+
+                writeCSVSpeckles(speckle_set,fname);
+
+                return new File(fname);
+            } catch(Exception e) {
+                JOptionPane.showMessageDialog(parent,"Could not write" + e.getMessage());
+            }
+        }
+        return null;
+    }
     
     public static void writeCSVSpeckles(HashSet<Speckle> speckle_set, String fname) throws Exception{
         

@@ -39,8 +39,8 @@ public class SpeckleApp{
        *    
        **/
        
-    public static String VERSION = "0.87";
-    public static String DATE = "10/11/2011";
+    public static String VERSION = "1.0";
+    public static String DATE = "1/14/2011";
     
     HashSet<Speckle> AllSpeckles,       //Stores all of the speckle data.
                      proof_speckles,    //used for the autolocate slider for drawing speckles

@@ -156,12 +156,15 @@ public class SpeckleListener implements MouseListener,MouseMotionListener,KeyLis
   public void keyPressed(KeyEvent e){
     if(MODE==NORMAL_MODE){
         switch(e.getKeyCode()){
+            case KeyEvent.VK_Z:
             case KeyEvent.VK_LEFT:
                 parent.stepBackward();
                 break;
+            case KeyEvent.VK_X:
             case KeyEvent.VK_RIGHT:
                 parent.stepForward();
                 break;
+            case KeyEvent.VK_SPACE:
             case KeyEvent.VK_T:
                 parent.trackSpeckle();
                 break;
@@ -169,7 +172,7 @@ public class SpeckleListener implements MouseListener,MouseMotionListener,KeyLis
             case KeyEvent.VK_P:
                 parent.mergeSpeckles();
                 break;
-            case KeyEvent.VK_S:
+            case KeyEvent.VK_W:
                 parent.showSpeckleAllFrames();
                 break;
             case KeyEvent.VK_A:
@@ -184,12 +187,15 @@ public class SpeckleListener implements MouseListener,MouseMotionListener,KeyLis
             case KeyEvent.VK_MINUS:
                 parent.zoomOut();
                 break;
+            case KeyEvent.VK_C:
             case KeyEvent.VK_M:
                 parent.maxLocateSpeckle();
                 break;
+            case KeyEvent.VK_S: 
             case KeyEvent.VK_UP:
                 parent.previousModel();
                 break;
+            case KeyEvent.VK_ALT:
             case KeyEvent.VK_DOWN:
                 parent.nextModel();
                 break;

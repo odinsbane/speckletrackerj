@@ -23,8 +23,11 @@ class SpeckleNoises implements Runnable{
             Synthesizer synth = MidiSystem.getSynthesizer();
             synth.open();
 
-            Soundbank sb = MidiSystem.getSoundbank(getClass().getResourceAsStream("/soundbank.gm"));
-            Instrument ins = sb.getInstruments()[408];
+            Soundbank sb = synth.getDefaultSoundbank();
+
+
+
+            Instrument ins = sb.getInstruments()[1];
 
             synth.loadInstrument(ins);
 
@@ -38,12 +41,7 @@ class SpeckleNoises implements Runnable{
 
         }catch(javax.sound.midi.MidiUnavailableException e){
             System.out.println("No sounds are Available, remaining mute.");
-        } catch (InvalidMidiDataException e) {
-            System.out.println("No sounds are Available, remaining mute.");
-
-        } catch (IOException e) {
-            System.out.println("Unable to read sound bank. remaining mute.");
-        } catch (NullPointerException e){
+        }  catch (NullPointerException e){
             System.out.println("sound bank not found. remaining mute");
         }
         if(x!=null){

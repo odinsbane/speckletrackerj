@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.StringTokenizer;
 
 public class SpeckleWriter{
-
+    public static String LAST_DIRECTORY;
     public static final String HEADING = "#speckles csv ver 1.2\n" + 
                                          "#x(double)\ty(double)\tsize(double)\tframe(int)\ttype(int)\n";
     
@@ -16,15 +16,19 @@ public class SpeckleWriter{
     }
     public static String getOpenFileName(Frame parent,String title){
         FileDialog fd = new FileDialog(parent,title,FileDialog.LOAD);
-        
+        if(LAST_DIRECTORY!=null){
+            fd.setDirectory(LAST_DIRECTORY);
+        }
         fd.setVisible(true);
         String fname = fd.getFile();
         String dirname = fd.getDirectory();
         String fullname = dirname +  fname;
-        if(fname!=null)
+        if(fname!=null){
+            LAST_DIRECTORY=dirname;
             return fullname;
-        else
+        }else{
             return null;
+        }
     }
 
     /**
@@ -39,13 +43,20 @@ public class SpeckleWriter{
     public static String getSaveFileName(Frame parent, String title){
         FileDialog fd = new FileDialog(parent,"Save CSV File",FileDialog.SAVE);
         fd.setFile(title + "_speckles.csv");
+
+        if(LAST_DIRECTORY!=null){
+            fd.setDirectory(LAST_DIRECTORY);
+        }
+
+
         fd.setVisible(true);
         String fname = fd.getFile();
         String dirname = fd.getDirectory();
         String fullname = dirname +  fname;
-        if(fname!=null)
+        if(fname!=null){
+            LAST_DIRECTORY=dirname;
             return fullname;
-        else
+        }else
             return null;
     }
 

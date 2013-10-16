@@ -202,7 +202,7 @@ public class DiffusingNCCModel extends SpeckleModel{
         //set new points
         
         ImageStack is = implus.getStack();
-        
+
         if(n<= SpeckleApp.getSlices(implus)){
             ImageProcessor next = is.getProcessor(n);
 

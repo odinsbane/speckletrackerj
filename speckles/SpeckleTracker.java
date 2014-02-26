@@ -36,18 +36,17 @@ public class SpeckleTracker implements Runnable{
      *  will be used until changed. 
      *     
      **/
-    public void createModel(Speckle speck){
+    public void trainModel(Speckle speck){
         
         SPECKLE_MODEL = CANONICAL_MODEL.createModel(speck);
-                
-        
+
     }
         
     
     public void createModel(HashSet<Speckle> speckles){
         
         SPECKLE_MODEL = CANONICAL_MODEL.createModel(speckles);
-                
+
     }
     
     /**
@@ -123,7 +122,12 @@ public class SpeckleTracker implements Runnable{
         };
         tracker.all_speckles = all_speckles;
         tracker.trackable_speckles = new HashSet<Speckle>();
-        tracker.trackable_speckles.add(selected);
+        if(selected!=null)
+            tracker.trackable_speckles.add(selected);
+        else{
+            System.out.println("null");
+        }
+
         tracker.start = start;
         tracker.TYPE = STATE_TRACK;
         return tracker;
@@ -255,9 +259,6 @@ public class SpeckleTracker implements Runnable{
         SpeckleEstimator speckle_estimator = new SpeckleEstimator(speckle);
 
         while(track){
-
-            createModel(speckle);
-
             track = trackSpeckle(speckle_estimator);
 
             if(speckles.SpeckleApp.isStopped()) break;

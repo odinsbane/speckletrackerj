@@ -49,7 +49,7 @@ import java.util.regex.Pattern;
         }
     };
 
-
+    SpeckleModel TRAINED;
     ImagePlus implus;
 
     
@@ -123,7 +123,7 @@ import java.util.regex.Pattern;
         return a;
         
     }
-    
+
  
     private static class VelocityModel extends SpeckleModel{
         public double DX,DY;

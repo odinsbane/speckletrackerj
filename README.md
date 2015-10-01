@@ -1,5 +1,5 @@
 # speckletrackerj
-Automatically exported from code.google.com/p/speckletrackerj
+
 
 Speckle TrackerJ is an ImageJ plugin created for recording the position of numerous speckles as they move through time. Speckle TrackerJ combines manual editing and computer assisted techniques to accurately position and track speckles.
 

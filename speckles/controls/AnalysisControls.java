@@ -40,9 +40,9 @@ class AnalysisControls{
         relative_value = new JTextField("0",10);
         relative_value.setHorizontalAlignment(JTextField.RIGHT);
         
-        relative_value.setMaximumSize(new Dimension(200, 20));
-        relative_value.setMinimumSize(new Dimension(200, 20));
-        relative_value.setPreferredSize(new Dimension(200, 20));
+        //relative_value.setMaximumSize(new Dimension(200, 20));
+        //relative_value.setMinimumSize(new Dimension(200, 20));
+        //relative_value.setPreferredSize(new Dimension(200, 20));
 
         
         row.add(label);
@@ -60,9 +60,9 @@ class AnalysisControls{
         halfwidth_value = new JTextField("15",10);
         halfwidth_value.setHorizontalAlignment(JTextField.RIGHT);
         
-        halfwidth_value.setMaximumSize(new Dimension(200, 20));
-        halfwidth_value.setMinimumSize(new Dimension(200, 20));
-        halfwidth_value.setPreferredSize(new Dimension(200, 20));
+        //halfwidth_value.setMaximumSize(new Dimension(200, 20));
+        //halfwidth_value.setMinimumSize(new Dimension(200, 20));
+        //halfwidth_value.setPreferredSize(new Dimension(200, 20));
         
         row.add(label);
         row.add(Box.createHorizontalGlue());
@@ -78,9 +78,9 @@ class AnalysisControls{
         speckle_type_spinner = new JSpinner(speckletypes);
         speckle_type_spinner.setEditor(new JSpinner.DefaultEditor(speckle_type_spinner));
         speckle_type_spinner.setToolTipText("Type of speckle to be selected for analysis.");
-        speckle_type_spinner.setPreferredSize(new Dimension(200,30));
-        speckle_type_spinner.setMaximumSize(new Dimension(200,30));
-        speckle_type_spinner.setMinimumSize(new Dimension(200,30));
+        //speckle_type_spinner.setPreferredSize(new Dimension(200,30));
+        //speckle_type_spinner.setMaximumSize(new Dimension(200,30));
+        //speckle_type_spinner.setMinimumSize(new Dimension(200,30));
         
         //row.add(label);
         row.add(Box.createHorizontalGlue());

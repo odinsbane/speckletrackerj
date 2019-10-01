@@ -56,6 +56,9 @@ public class SpeckleTracker implements Runnable{
     
     public boolean trackSpeckle(SpeckleEstimator speck){
             int n = speck.getLastFrame() + 1;
+
+
+
             SPECKLE_MODEL.estimateLocation(speck, n);
             return speck.isWorking();
 
@@ -238,6 +241,7 @@ public class SpeckleTracker implements Runnable{
    public static SpeckleTracker autoTrackSpeckle(Speckle speck, ImagePlus implus, SpeckleModel sm){
         SpeckleTracker tracker = new SpeckleTracker(implus, sm);
         tracker.speckle = speck;
+        tracker.trainModel(speck);
         tracker.TYPE = SINGLE_TRACK;
         return tracker;
 

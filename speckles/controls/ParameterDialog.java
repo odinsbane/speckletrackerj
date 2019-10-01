@@ -156,9 +156,10 @@ public class ParameterDialog extends JDialog implements ActionListener, WindowLi
             JLabel l = StyledComponents.createStyledLabel(s.toString());
             JTextField tf = new JTextField();
             tf.setText(" " + map.get(s));
-            tf.setPreferredSize(new Dimension(200,20));
-            tf.setMaximumSize(new Dimension(200,20));
-
+            //tf.setPreferredSize(new Dimension(200,20));
+            System.out.println((int)(tf.getFontMetrics(tf.getFont()).getHeight()*4));
+            tf.setMaximumSize(new Dimension(200, (int)(tf.getFontMetrics(tf.getFont()).getHeight()*3)));
+            tf.setPreferredSize(new Dimension(200, (int)(tf.getFontMetrics(tf.getFont()).getHeight()*3)));
             row.add(l);
             row.add(Box.createHorizontalGlue());
             row.add(tf);

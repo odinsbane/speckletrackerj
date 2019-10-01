@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 public class SpeckleWriter{
@@ -136,7 +137,7 @@ public class SpeckleWriter{
         return null;
     }
     
-    public static void writeCSVSpeckles(HashSet<Speckle> speckle_set, String fname) throws Exception{
+    public static void writeCSVSpeckles(Set<Speckle> speckle_set, String fname) throws IOException{
         
        
            

@@ -3,7 +3,7 @@
 
 Speckle TrackerJ is an ImageJ plugin created for recording the position of numerous speckles as they move through time. Speckle TrackerJ combines manual editing and computer assisted techniques to accurately position and track speckles.
 
-This site has the source code of the project. Go to http://athena.physics.lehigh.edu/speckletrackerj to download a compiled version and for user instructions.
+This site has the source code of the project. Go to http://www.lehigh.edu/~div206/speckletrackerj to download a compiled version and for user instructions.
 
 This work is supported by the Human Frontiers Science Program and by NIH.
 
